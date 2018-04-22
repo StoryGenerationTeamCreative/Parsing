@@ -25,23 +25,6 @@ def findTree(data):
     
     for token in doc:
         # print(token.text, token.dep_, token.head.text, token.head.pos_, [child for child in token.children])
-        if token.dep_ == "ROOT":
-            mainVerb = token.text
-            for child in token.children:
-                if child.dep_ == "conj":
-                    subVerb = child.text
-                    tempS = []
-                    tempO = []
-                    for baby in child.children:
-                        if baby.dep_ == "nsubj":
-                            tempS.append(baby.text)
-                        if baby.dep_ == "dobj":
-                            tempO.append(baby.text)
-                    if len(tempS) == 0:
-                        tempS = subj
-                    for su in tempS:
-                        for ob in tempO:
-                            allEvents.append(createEvent(su, subVerb, ob))
         
         if token.dep_ == "nsubj" and token.head.dep_ == "ROOT":
             subj.append(token.text)
@@ -60,11 +43,39 @@ def findTree(data):
             for child in token.children:
                 if child.dep_ == "conj":
                     dobj.append(child.text)
+                    
+        if token.dep_ == "ROOT":
+            mainVerb = token.text
+            for child in token.children:
+                if child.dep_ == "conj":
+                    subVerb = child.text
+                    tempS = []
+                    tempO = []
+                    for baby in child.children:
+                        if baby.dep_ == "nsubj":
+                            tempS.append(baby.text)
+                        if baby.dep_ == "dobj":
+                            tempO.append(baby.text)
+                    if len(tempS) == 0:
+                        tempS = subj
+                    if len(tempO) == 0:
+                        tempO = dobj
+                    for su in tempS:
+                        if len(tempO) == 0:
+                            event = createEvent(su, subVerb, "")
+                            allEvents.append(event)
+                        else:
+                            for ob in tempO:
+                                allEvents.append(createEvent(su, subVerb, ob))
 
     for s in subj:
-        for o in dobj:
-            event = createEvent(s, mainVerb, o)
+        if len(dobj) == 0:
+            event = createEvent(s, mainverb, "")
             allEvents.append(event)
+        else:
+            for o in dobj:
+                event = createEvent(s, mainVerb, o)
+                allEvents.append(event)
     
     return allEvents
 
@@ -84,7 +95,7 @@ def stem(data_string):
 
 def main():
     # data = getData().splitlines()
-    data = ['John and Lisa go to the store and the park', 'John goes to the supermarket and runs in the park', 'Abby writes a lab and Chris reads it']
+    data = ['John and Lisa go to the store and the park', 'John goes to the market and runs in the park', 'Abby writes a lab and Chris reads it']
     #for x in range(len(data)):
     #    data[x] = stem(data[x])
     # results = np.array(map(getPOS, data))
