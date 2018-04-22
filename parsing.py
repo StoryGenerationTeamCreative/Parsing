@@ -25,14 +25,17 @@ def findTree(data):
     
     for token in doc:
         # print(token.text, token.dep_, token.head.text, token.head.pos_, [child for child in token.children])
-        
+
+        # find subjects of main verb
         if token.dep_ == "nsubj" and token.head.dep_ == "ROOT":
             subj.append(token.text)
+            
             for child in token.children:
                 if child.dep_ == "conj":
                     subj.append(child.text)
                     
-        
+
+        # find objects of main verb and/or objects of prepositions relating to main verb
         if token.dep_ == "dobj" and token.head.dep_ == "ROOT":
             dobj.append(token.text)
             for child in token.children:
@@ -43,7 +46,8 @@ def findTree(data):
             for child in token.children:
                 if child.dep_ == "conj":
                     dobj.append(child.text)
-                    
+        
+        # find main verbs            
         if token.dep_ == "ROOT":
             mainVerb = token.text
             for child in token.children:
@@ -67,10 +71,10 @@ def findTree(data):
                         else:
                             for ob in tempO:
                                 allEvents.append(createEvent(su, subVerb, ob))
-
+    
     for s in subj:
         if len(dobj) == 0:
-            event = createEvent(s, mainverb, "")
+            event = createEvent(s, mainVerb, "")
             allEvents.append(event)
         else:
             for o in dobj:
@@ -95,13 +99,16 @@ def stem(data_string):
 
 def main():
     # data = getData().splitlines()
-    data = ['John and Lisa go to the store and the park', 'John goes to the market and runs in the park', 'Abby writes a lab and Chris reads it']
+    data = ['John and Lisa go to the store and the park', 'John goes to the market and runs in the park', 'Before Sally cooks dinner, she shops.']
     #for x in range(len(data)):
     #    data[x] = stem(data[x])
     # results = np.array(map(getPOS, data))
+    allEvents = []
     for sentence in data:
         print(sentence)
         events = findTree(sentence)
-        print(events)
+        for event in events:
+            allEvents.append(event)
+    print(allEvents)
 
 main()
