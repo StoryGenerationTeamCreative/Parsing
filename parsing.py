@@ -5,12 +5,13 @@ import spacy
 from nltk.stem.porter import PorterStemmer
 from nltk.parse.stanford import StanfordDependencyParser
 
-def createEvent(s, v, o):
+def createEvent(s, v, o, m):
     event = [""] * 4
     event[0] = s
     verb = stem(v)
     event[1] = verb
     event[2] = o
+    event[3] = m
     return event
 
 def findTree(data):
@@ -22,9 +23,10 @@ def findTree(data):
     subj = []
     mainVerb = ""
     dobj = []
+    misc = []
     
     for token in doc:
-        # print(token.text, token.dep_, token.head.text, token.head.pos_, [child for child in token.children])
+        print(token.text, token.dep_, token.head.text, token.head.pos_, [child for child in token.children])
 
         # find subjects of main verb
         if token.dep_ == "nsubj" and token.head.dep_ == "ROOT":
@@ -46,6 +48,14 @@ def findTree(data):
             for child in token.children:
                 if child.dep_ == "conj":
                     dobj.append(child.text)
+
+        # find miscellaneous, currently indirect objects
+        """ elif token.dep_ == "dative" and token.head.dep_ == "ROOT":
+            misc.append(token.text)
+            for child in token.children:
+                if child.dep_ == "conj":
+                    misc.append(child.text) """
+        
         
         # find main verbs            
         if token.dep_ == "ROOT":
@@ -53,8 +63,10 @@ def findTree(data):
             for child in token.children:
                 if child.dep_ == "conj":
                     subVerb = child.text
+                    print(subVerb)
                     tempS = []
                     tempO = []
+                    tempM = []
                     for baby in child.children:
                         if baby.dep_ == "nsubj":
                             tempS.append(baby.text)
@@ -64,21 +76,25 @@ def findTree(data):
                         tempS = subj
                     if len(tempO) == 0:
                         tempO = dobj
+                    if len(tempM) == 0:
+                        tempM = misc
                     for su in tempS:
                         if len(tempO) == 0:
-                            event = createEvent(su, subVerb, "")
+                            event = createEvent(su, subVerb, "", "")
                             allEvents.append(event)
                         else:
                             for ob in tempO:
-                                allEvents.append(createEvent(su, subVerb, ob))
+                                event = createEvent(su, subVerb, ob, "")
+                                allEvents.append(event)
     
     for s in subj:
         if len(dobj) == 0:
-            event = createEvent(s, mainVerb, "")
+            event = createEvent(s, mainVerb, "", "")
             allEvents.append(event)
         else:
+            
             for o in dobj:
-                event = createEvent(s, mainVerb, o)
+                event = createEvent(s, mainVerb, o, "")
                 allEvents.append(event)
     
     return allEvents
@@ -99,7 +115,7 @@ def stem(data_string):
 
 def main():
     # data = getData().splitlines()
-    data = ['John and Lisa go to the store and the park', 'John goes to the market and runs in the park', 'Before Sally cooks dinner, she shops.']
+    data = ['John and Lisa go to the store and the park', 'John gave Ella and me a present and made us dinner', 'Before she cooks, Sally shops']
     #for x in range(len(data)):
     #    data[x] = stem(data[x])
     # results = np.array(map(getPOS, data))
