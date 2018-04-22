@@ -30,6 +30,7 @@ def findTree(data):
             root = token
             mainVerb = token.text
 
+    # use recursion in some way? see exploreBranch()
     for child in root.children:
         print(child.text)
     
@@ -44,6 +45,10 @@ def findTree(data):
                 allEvents.append(event)
     
     return allEvents
+
+def exploreBranch(tree, node):
+    for child in node.children:
+        print(child.text)
 
 def getPOS(data_string):
     tokens = nltk.word_tokenize(data_string)
