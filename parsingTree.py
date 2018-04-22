@@ -18,23 +18,14 @@ def findTree(data):
     nlp = spacy.load('en')
     doc = nlp(data)
 
-    allEvents = []
-    
-    subj = []
-    mainVerb = ""
-    dobj = []
-    misc = []
-    
+    # find root
     for token in doc:
         if token.dep_ == "ROOT":
             root = token
-            mainVerb = token.text
 
-    # use recursion in some way? see exploreBranch()
-    for child in root.children:
-        print(child.text)
+    exploreBranch(root)
     
-    for s in subj:
+    """ for s in subj:
         if len(dobj) == 0:
             event = createEvent(s, mainVerb, "", "")
             allEvents.append(event)
@@ -44,11 +35,44 @@ def findTree(data):
                 event = createEvent(s, mainVerb, o, "")
                 allEvents.append(event)
     
-    return allEvents
+    return allEvents """
 
-def exploreBranch(tree, node):
+def exploreBranch(node):
+    print(node.text)
+    subj = []
+    verb = node.text
+    dobj = []
+    misc = []
+    
     for child in node.children:
         print(child.text)
+        print(child.dep_)
+        # find subject
+        if child.dep_ == "nsubj":
+            subj.append(child.text)
+
+        # find objects (direct and objects of preposition)
+        if child.dep_ == "dobj":
+            dobj.append(child.text)
+        if child.dep_ == "prep":
+            print(child.children)
+            for gchild in child.children:
+                if gchild.dep_ == "pobj":
+                    dobj.append(child.text)
+
+        # find misc. (indirect objects)
+        if child.dep_ == "dative":
+            misc.append(child.text)
+
+        # find other verbs
+        if child.dep_ == "conj":
+            exploreBranch(child)
+
+    for sub in subj:
+        for do in dobj:
+            event = createEvent(sub, verb, dobj, "")
+
+    return event
 
 def getPOS(data_string):
     tokens = nltk.word_tokenize(data_string)
