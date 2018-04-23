@@ -23,6 +23,12 @@ def parseSentence(data):
         if token.dep_ == "ROOT":
             root = token
 
+    try:
+        root
+    except NameError:
+        # not a complete sentence, ignore.
+        return []
+    
     subj = []
     dobj = []
     misc = []
@@ -43,12 +49,14 @@ def exploreBranch(subj, node, dobj, misc):
     dobj = []
     misc = []
 
-    print(node.text, node.dep_, node.head.text, node.head.pos_, [child for child in node.children])
+    # debugging statement
+    # print(node.text, node.dep_, node.head.text, node.head.pos_, [child for child in node.children])
 
     # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
-        # very good for debugging
-        print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
+        # another debugging statement
+        # print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
+        
         # find subject
         if child.dep_ == "nsubj":
             subj.append(child.text)
@@ -70,7 +78,7 @@ def exploreBranch(subj, node, dobj, misc):
                         if baby.dep_ == "conj":
                             dobj.append(baby.text)
 
-        # find misc. (indirect objects and adverbs)
+        # find indirect objects and adverbs
         if child.dep_ == "dative":
             misc.append(child.text)
             for gchild in child.children:
@@ -82,7 +90,7 @@ def exploreBranch(subj, node, dobj, misc):
                 if gchild.dep_ == "conj":
                     misc.append(gchild.text)
 
-        # find other main verbs
+        # find other verbs, either conjunct or subordinate
         if child.dep_ == "conj" or child.dep_ == "advcl":
             subEvents = exploreBranch(subj, child, dobj, misc)
             for event in subEvents:
@@ -121,12 +129,13 @@ def stem(data_string):
     for word in words:
         out_str += porter_stemmer.stem(word) + " "
     return out_str
-    
+
+def getData():
+    return "John and Lisa go to the store and the park. John runs quickly and steadily at the park. While John runs, Lisa buys groceries."
 
 def main():
     # data = getData().splitlines()
-    # data = getData().split(".")
-    data = ['John and Lisa go to the store and the park', 'John runs quickly and steadily in the park', 'Before Sally cooks dinner, she buys groceries']
+    data = getData().split(".")
     
     allEvents = []
     for sentence in data:
