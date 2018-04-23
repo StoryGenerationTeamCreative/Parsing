@@ -70,21 +70,23 @@ def exploreBranch(subj, node, dobj, misc):
                         if baby.dep_ == "conj":
                             dobj.append(baby.text)
 
-        # find misc. (indirect objects)
+        # find misc. (indirect objects and adverbs)
         if child.dep_ == "dative":
             misc.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
                     misc.append(gchild.text)
-            
+        if child.dep_ == "advmod":
+            misc.append(child.text)
+            for gchild in child.children:
+                if gchild.dep_ == "conj":
+                    misc.append(gchild.text)
 
         # find other main verbs
-        if child.dep_ == "conj":
+        if child.dep_ == "conj" or child.dep_ == "advcl":
             subEvents = exploreBranch(subj, child, dobj, misc)
             for event in subEvents:
                 allEvents.append(event)
-
-        # TODO: examine subordinate clauses
         
 
     if len(subj) == 0:
@@ -123,10 +125,9 @@ def stem(data_string):
 
 def main():
     # data = getData().splitlines()
-    data = ['John and Lisa go to the store and the park', 'John gave me a present and made us dinner', 'Before she cooks, Sally shops']
-    #for x in range(len(data)):
-    #    data[x] = stem(data[x])
-    # results = np.array(map(getPOS, data))
+    # data = getData().split(".")
+    data = ['John and Lisa go to the store and the park', 'John runs quickly and steadily in the park', 'Before Sally cooks dinner, she buys groceries']
+    
     allEvents = []
     for sentence in data:
         print(sentence)
