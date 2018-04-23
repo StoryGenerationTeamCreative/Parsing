@@ -14,7 +14,7 @@ def createEvent(s, v, o, m):
     event[3] = m
     return event
 
-def findTree(data):
+def parseSentence(data):
     nlp = spacy.load('en')
     doc = nlp(data)
 
@@ -23,15 +23,27 @@ def findTree(data):
         if token.dep_ == "ROOT":
             root = token
 
-    events = exploreBranch(root)
-    return events
-
-def exploreBranch(node):
-    print(node.text)
     subj = []
-    verb = node.text
     dobj = []
     misc = []
+    events = exploreBranch(subj, root, dobj, misc)
+    
+    return events
+
+def exploreBranch(subj, node, dobj, misc):
+    verb = node.text
+
+    allEvents = []
+
+    superS = subj
+    superO = dobj
+    superM = misc
+
+    subj = []
+    dobj = []
+    misc = []
+
+    print(node.text, node.dep_, node.head.text, node.head.pos_, [child for child in node.children])
 
     # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
@@ -40,29 +52,60 @@ def exploreBranch(node):
         # find subject
         if child.dep_ == "nsubj":
             subj.append(child.text)
+            for gchild in child.children:
+                if gchild.dep_ == "conj":
+                    subj.append(gchild.text)
 
         # find objects (direct and objects of preposition)
         if child.dep_ == "dobj":
             dobj.append(child.text)
+            for gchild in child.children:
+                if gchild.dep_ == "conj":
+                    dobj.append(gchild.text)
         if child.dep_ == "prep":
             for gchild in child.children:
-                print(gchild.text)
                 if gchild.dep_ == "pobj":
                     dobj.append(gchild.text)
+                    for baby in gchild.children:
+                        if baby.dep_ == "conj":
+                            dobj.append(baby.text)
 
         # find misc. (indirect objects)
         if child.dep_ == "dative":
             misc.append(child.text)
+            for gchild in child.children:
+                if gchild.dep_ == "conj":
+                    misc.append(gchild.text)
+            
 
-        # find other verbs
+        # find other main verbs
         if child.dep_ == "conj":
-            exploreBranch(child)
+            subEvents = exploreBranch(subj, child, dobj, misc)
+            for event in subEvents:
+                allEvents.append(event)
+
+        # TODO: examine subordinate clauses
+        
+
+    if len(subj) == 0:
+        subj = superS
+        
+    if len(dobj) == 0 and len(superO) == 0:
+        dobj = [""]
+    elif len(dobj) == 0:
+        dobj = superO
+        
+    if len(misc) == 0 and len(superM) == 0:
+        misc = [""]
+    elif len(misc) == 0:
+        misc = superM
     
     for sub in subj:
-        # TODO: add check for no dobj (code written in parsing.py)
         for do in dobj:
-            event = createEvent(sub, verb, do, "")
-    return event
+            for mi in misc:
+                allEvents.append(createEvent(sub, verb, do, mi))
+    return allEvents
+    
 
 def getPOS(data_string):
     tokens = nltk.word_tokenize(data_string)
@@ -80,14 +123,14 @@ def stem(data_string):
 
 def main():
     # data = getData().splitlines()
-    data = ['John and Lisa go to the store and the park', 'John gave Ella and me a present and made us dinner', 'Before she cooks, Sally shops']
+    data = ['John and Lisa go to the store and the park', 'John gave me a present and made us dinner', 'Before she cooks, Sally shops']
     #for x in range(len(data)):
     #    data[x] = stem(data[x])
     # results = np.array(map(getPOS, data))
     allEvents = []
     for sentence in data:
         print(sentence)
-        events = findTree(sentence)
+        events = parseSentence(sentence)
         for event in events:
             allEvents.append(event)
     print(allEvents)
