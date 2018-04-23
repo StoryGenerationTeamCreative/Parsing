@@ -23,19 +23,8 @@ def findTree(data):
         if token.dep_ == "ROOT":
             root = token
 
-    exploreBranch(root)
-    
-    """ for s in subj:
-        if len(dobj) == 0:
-            event = createEvent(s, mainVerb, "", "")
-            allEvents.append(event)
-        else:
-            
-            for o in dobj:
-                event = createEvent(s, mainVerb, o, "")
-                allEvents.append(event)
-    
-    return allEvents """
+    events = exploreBranch(root)
+    return events
 
 def exploreBranch(node):
     print(node.text)
@@ -43,10 +32,11 @@ def exploreBranch(node):
     verb = node.text
     dobj = []
     misc = []
-    
+
+    # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
-        print(child.text)
-        print(child.dep_)
+        # very good for debugging
+        print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
         # find subject
         if child.dep_ == "nsubj":
             subj.append(child.text)
@@ -55,10 +45,10 @@ def exploreBranch(node):
         if child.dep_ == "dobj":
             dobj.append(child.text)
         if child.dep_ == "prep":
-            print(child.children)
             for gchild in child.children:
+                print(gchild.text)
                 if gchild.dep_ == "pobj":
-                    dobj.append(child.text)
+                    dobj.append(gchild.text)
 
         # find misc. (indirect objects)
         if child.dep_ == "dative":
@@ -67,11 +57,11 @@ def exploreBranch(node):
         # find other verbs
         if child.dep_ == "conj":
             exploreBranch(child)
-
+    
     for sub in subj:
+        # TODO: add check for no dobj (code written in parsing.py)
         for do in dobj:
-            event = createEvent(sub, verb, dobj, "")
-
+            event = createEvent(sub, verb, do, "")
     return event
 
 def getPOS(data_string):
