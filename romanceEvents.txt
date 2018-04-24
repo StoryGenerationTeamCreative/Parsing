@@ -1,0 +1,1 @@
+["John is happy", " John is the winner", ""]

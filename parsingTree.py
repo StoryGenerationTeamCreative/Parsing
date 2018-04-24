@@ -1,4 +1,5 @@
 import numpy as np
+import json
 import nltk
 import spacy
 import sys
@@ -135,10 +136,9 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    # data = ""
-    #for line in sys.stdin:
-    #    data = data + line
-    data = "John is happy. John is the winner."
+    data = ""
+    for line in sys.stdin:
+        data = data + line
     return data
 
 def main():
@@ -156,7 +156,7 @@ def main():
             allEvents.append(event)
 
     # print((time.time() - start_time))
-            
-    print(allEvents)
+    with open('romanceEvents.txt', 'w') as outfile:
+        json.dump(data, outfile)
 
 main()
