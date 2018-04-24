@@ -157,7 +157,8 @@ def main():
         for event in events:
             allEvents.append(event)
 
+    print(allEvents)
     # print((time.time() - start_time))
-    json.dump(allEvents)
+    json.dump(allEvents, sys.stdout)
 
 main()
