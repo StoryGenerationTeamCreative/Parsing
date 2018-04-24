@@ -1,5 +1,4 @@
 import numpy as np
-import json
 import nltk
 import spacy
 import sys
@@ -139,26 +138,28 @@ def stem(data_string):
 
 def getData():
     data = ""
-    for line in sys.stdin:
-        data = data + line
+    #for line in sys.stdin:
+    #    data = data + line
+    data = "lydia sits on the couch. Emre works on his homework and Chris watches TV. \n Ares and Lucas watch Westworld."
     return data
 
 def main():
-    # data = getData().splitlines()
-    data = getData().split(".")
+    stories = getData().splitlines()
     nlp = spacy.load('en')
     # print(data)
 
     # start_time = time.time()
     
     allEvents = []
-    for sentence in data:
-        events = parseSentence(sentence)
-        for event in events:
-            allEvents.append(event)
-
-    print(allEvents)
+    for story in stories:
+        print("SOS\tSOS\tSOS\tSOS")
+        data = story.split(".")
+        for sentence in data:
+            events = parseSentence(sentence)
+            for event in events:
+                print("%s\t%s\t%s\t%s" % (event[0], event[1], event[2], event[3]))
+        print("EOS\tEOS\tEOS\tEOS")
+    
     # print((time.time() - start_time))
-    # json.dump(allEvents, sys.stdout)
 
 main()
