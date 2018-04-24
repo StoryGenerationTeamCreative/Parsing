@@ -133,10 +133,10 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    """data = ""
+    data = ""
     for line in sys.stdin:
-        data = data + line"""
-    return "John and Lisa go to the store and the park. John runs quickly and steadily at the park. While John runs, Lisa buys groceries."
+        data = data + line
+    return data
 
 def main():
     # data = getData().splitlines()
