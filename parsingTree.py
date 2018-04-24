@@ -124,12 +124,12 @@ def getPOS(data_string):
     tags = nltk.pos_tag(tokens)
     return tags
 
+lmtzr = WordNetLemmatizer()
 def lemma(data_string):
-    lmtzr = WordNetLemmatizer()
     return lmtzr.lemmatize(data_string)
 
+stmmr = PorterStemmer()
 def stem(data_string):
-    stmmr = PorterStemmer()
     return stmmr.stem(data_string)
 
 def getData():

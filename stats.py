@@ -1,4 +1,5 @@
 import sys
+import nltk
 
 def stat():
     lines = "" 
@@ -6,7 +7,14 @@ def stat():
         lines = lines + line
     print("Sentences: " + str(lines.count(".")))
     print("Events ~= " + str(3 * lines.count(".")))
-    lines = lines.split(" ")
-    print("Words: " + str(len(set(lines))))
+    print("Unique Words: " + str(len(set(lines.split(" ")))))
+
+    tokens = nltk.word_tokenize(lines)
+    tokens = set(tokens)
+    tagged = nltk.pos_tag(tokens)
+    pos = map(lambda x : x[1], tagged)
+    pronouns = filter(lambda x : x == "NNP" or x == "NNPS", pos)
+    print("Pronouns count: " + str(len(list(pronouns))))
+
 if __name__ == '__main__':
     stat()
