@@ -156,7 +156,6 @@ def main():
             allEvents.append(event)
 
     # print((time.time() - start_time))
-    with open('romanceEvents.txt', 'w') as outfile:
-        json.dump(data, outfile)
+    json.dump(allEvents)
 
 main()
