@@ -129,9 +129,11 @@ def getPOS(data_string):
     tags = nltk.pos_tag(tokens)
     return tags
 
+lmtzr = WordNetLemmatizer()
 def lemma(data_string):
     return lmtzr.lemmatize(data_string)
 
+stmmr = PorterStemmer()
 def stem(data_string):
     return stmmr.stem(data_string)
 
