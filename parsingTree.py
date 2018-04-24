@@ -60,7 +60,7 @@ def exploreBranch(subj, node, dobj, misc):
     # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
         # another debugging statement
-        # print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
+        print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
         
         # find subject
         if child.dep_ == "nsubj":
@@ -69,8 +69,8 @@ def exploreBranch(subj, node, dobj, misc):
                 if gchild.dep_ == "conj":
                     subj.append(gchild.text)
 
-        # find objects (direct and objects of preposition)
-        if child.dep_ == "dobj":
+        # find objects (direct and objects of preposition, predicate nominatives and adjectives)
+        if child.dep_ == "dobj" or child.dep_ == "acomp" or child.dep_ == "attr":
             dobj.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
@@ -135,9 +135,10 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    data = ""
-    for line in sys.stdin:
-        data = data + line
+    # data = ""
+    #for line in sys.stdin:
+    #    data = data + line
+    data = "John is happy. John is the winner."
     return data
 
 def main():
