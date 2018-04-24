@@ -61,7 +61,7 @@ def exploreBranch(subj, node, dobj, misc):
     # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
         # another debugging statement
-        print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
+        # print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
         
         # find subject
         if child.dep_ == "nsubj":
@@ -157,6 +157,6 @@ def main():
 
     print(allEvents)
     # print((time.time() - start_time))
-    json.dump(allEvents, sys.stdout)
+    # json.dump(allEvents, sys.stdout)
 
 main()
