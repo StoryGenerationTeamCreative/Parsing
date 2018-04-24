@@ -1,10 +1,15 @@
 import numpy as np
+import json
 import nltk
 import spacy
 import sys
 import time
 from nltk.stem.porter import PorterStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
+
+nlp = spacy.load('en')
+lmtzr = WordNetLemmatizer()
+stmmr = PorterStemmer()
 
 # possible optimization: initialize stmmr and/or lmmtzr once in main and pass as argument?
 
@@ -16,7 +21,7 @@ def createEvent(s, v, o, m):
     event[3] = stem(m)
     return event
 
-def parseSentence(data, nlp):
+def parseSentence(data):
     doc = nlp(data)
 
     # find root
@@ -56,7 +61,7 @@ def exploreBranch(subj, node, dobj, misc):
     # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
         # another debugging statement
-        # print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
+        print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
         
         # find subject
         if child.dep_ == "nsubj":
@@ -65,8 +70,8 @@ def exploreBranch(subj, node, dobj, misc):
                 if gchild.dep_ == "conj":
                     subj.append(gchild.text)
 
-        # find objects (direct and objects of preposition)
-        if child.dep_ == "dobj":
+        # find objects (direct and objects of preposition, predicate nominatives and adjectives)
+        if child.dep_ == "dobj" or child.dep_ == "acomp" or child.dep_ == "attr":
             dobj.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
@@ -142,18 +147,17 @@ def main():
     # data = getData().splitlines()
     data = getData().split(".")
     nlp = spacy.load('en')
-    print(data)
+    # print(data)
 
-    start_time = time.time()
+    # start_time = time.time()
     
     allEvents = []
     for sentence in data:
-        events = parseSentence(sentence, nlp)
+        events = parseSentence(sentence)
         for event in events:
             allEvents.append(event)
 
-    print((time.time() - start_time)/3)
-            
-    print(allEvents)
+    # print((time.time() - start_time))
+    json.dump(allEvents)
 
 main()
