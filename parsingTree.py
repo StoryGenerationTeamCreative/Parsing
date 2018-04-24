@@ -3,14 +3,15 @@ import nltk
 import spacy
 import sys
 from nltk.stem.porter import PorterStemmer
+from nltk.stem.wordnet import WordNetLemmatizer
 
 def createEvent(s, v, o, m):
+    lmtzr = WordNetLemmatizer()
     event = [""] * 4
-    event[0] = s
-    verb = stem(v)
-    event[1] = verb
-    event[2] = o
-    event[3] = m
+    event[0] = lemma(s)
+    event[1] = lemma(v)
+    event[2] = lemma(o)
+    event[3] = lemma(m)
     return event
 
 def parseSentence(data):
@@ -49,12 +50,12 @@ def exploreBranch(subj, node, dobj, misc):
     misc = []
 
     # debugging statement
-    print(node.text, node.dep_, node.head.text, node.head.pos_, [child for child in node.children])
+    # print(node.text, node.dep_, node.head.text, node.head.pos_, [child for child in node.children])
 
     # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
         # another debugging statement
-        print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
+        # print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
         
         # find subject
         if child.dep_ == "nsubj":
@@ -122,13 +123,9 @@ def getPOS(data_string):
     tags = nltk.pos_tag(tokens)
     return tags
 
-def stem(data_string):
-    porter_stemmer = PorterStemmer()
-    out_str = ""
-    words = data_string.split()
-    for word in words:
-        out_str += porter_stemmer.stem(word) + " "
-    return out_str
+def lemma(data_string):
+    lmtzr = WordNetLemmatizer()
+    return lmtzr.lemmatize(data_string)
 
 def getData():
     """data = ""
@@ -143,10 +140,10 @@ def main():
     
     allEvents = []
     for sentence in data:
-        print(sentence)
         events = parseSentence(sentence)
         for event in events:
             allEvents.append(event)
+            
     print(allEvents)
 
 main()
