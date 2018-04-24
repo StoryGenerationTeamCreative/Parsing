@@ -1,9 +1,8 @@
 import numpy as np
-# import spacy
 import nltk
 import spacy
+import sys
 from nltk.stem.porter import PorterStemmer
-from nltk.parse.stanford import StanfordDependencyParser
 
 def createEvent(s, v, o, m):
     event = [""] * 4
@@ -50,12 +49,12 @@ def exploreBranch(subj, node, dobj, misc):
     misc = []
 
     # debugging statement
-    # print(node.text, node.dep_, node.head.text, node.head.pos_, [child for child in node.children])
+    print(node.text, node.dep_, node.head.text, node.head.pos_, [child for child in node.children])
 
     # general idea, find everything related to current verb and recurse on other verbs found
     for child in node.children:
         # another debugging statement
-        # print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
+        print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
         
         # find subject
         if child.dep_ == "nsubj":
@@ -114,6 +113,7 @@ def exploreBranch(subj, node, dobj, misc):
         for do in dobj:
             for mi in misc:
                 allEvents.append(createEvent(sub, verb, do, mi))
+    
     return allEvents
     
 
@@ -131,11 +131,15 @@ def stem(data_string):
     return out_str
 
 def getData():
+    """data = ""
+    for line in sys.stdin:
+        data = data + line"""
     return "John and Lisa go to the store and the park. John runs quickly and steadily at the park. While John runs, Lisa buys groceries."
 
 def main():
     # data = getData().splitlines()
     data = getData().split(".")
+    print(data)
     
     allEvents = []
     for sentence in data:
