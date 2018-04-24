@@ -135,10 +135,9 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    #data = ""
-    #for line in sys.stdin:
-    #    data = data + line
-    data = "john and lisa went to the park"
+    data = ""
+    for line in sys.stdin:
+        data = data + line
     return data
 
 def main():
@@ -147,7 +146,7 @@ def main():
     nlp = spacy.load('en')
     # print(data)
 
-    start_time = time.time()
+    # start_time = time.time()
     
     allEvents = []
     for sentence in data:
@@ -155,7 +154,7 @@ def main():
         for event in events:
             allEvents.append(event)
 
-    print((time.time() - start_time))
+    # print((time.time() - start_time))
             
     print(allEvents)
 
