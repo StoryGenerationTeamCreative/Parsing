@@ -6,6 +6,10 @@ import time
 from nltk.stem.porter import PorterStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 
+nlp = spacy.load('en')
+lmtzr = WordNetLemmatizer()
+stmmr = PorterStemmer()
+
 # possible optimization: initialize stmmr and/or lmmtzr once in main and pass as argument?
 
 def createEvent(s, v, o, m):
@@ -16,7 +20,7 @@ def createEvent(s, v, o, m):
     event[3] = stem(m)
     return event
 
-def parseSentence(data, nlp):
+def parseSentence(data):
     doc = nlp(data)
 
     # find root
@@ -125,34 +129,33 @@ def getPOS(data_string):
     return tags
 
 def lemma(data_string):
-    lmtzr = WordNetLemmatizer()
     return lmtzr.lemmatize(data_string)
 
 def stem(data_string):
-    stmmr = PorterStemmer()
     return stmmr.stem(data_string)
 
 def getData():
-    data = ""
-    for line in sys.stdin:
-        data = data + line
+    #data = ""
+    #for line in sys.stdin:
+    #    data = data + line
+    data = "john and lisa went to the park"
     return data
 
 def main():
     # data = getData().splitlines()
     data = getData().split(".")
     nlp = spacy.load('en')
-    print(data)
+    # print(data)
 
     start_time = time.time()
     
     allEvents = []
     for sentence in data:
-        events = parseSentence(sentence, nlp)
+        events = parseSentence(sentence)
         for event in events:
             allEvents.append(event)
 
-    print((time.time() - start_time)/3)
+    print((time.time() - start_time))
             
     print(allEvents)
 
