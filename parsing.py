@@ -1,9 +1,9 @@
 import numpy as np
-# import spacy
 import nltk
 import spacy
 from nltk.stem.porter import PorterStemmer
 from nltk.parse.stanford import StanfordDependencyParser
+import sys
 
 def createEvent(s, v, o, m):
     event = [""] * 4
@@ -26,7 +26,6 @@ def findTree(data):
     misc = []
     
     for token in doc:
-        print(token.text, token.dep_, token.head.text, token.head.pos_, [child for child in token.children])
 
         # find subjects of main verb
         if token.dep_ == "nsubj" and token.head.dep_ == "ROOT":
@@ -114,14 +113,8 @@ def stem(data_string):
     
 
 def main():
-    # data = getData().splitlines()
-    data = ['John and Lisa go to the store and the park', 'John gave Ella and me a present and made us dinner', 'Before she cooks, Sally shops']
-    #for x in range(len(data)):
-    #    data[x] = stem(data[x])
-    # results = np.array(map(getPOS, data))
     allEvents = []
-    for sentence in data:
-        print(sentence)
+    for sentence in sys.stdin:
         events = findTree(sentence)
         for event in events:
             allEvents.append(event)
