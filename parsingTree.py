@@ -138,9 +138,8 @@ def stem(data_string):
 
 def getData():
     data = ""
-    #for line in sys.stdin:
-    #    data = data + line
-    data = "lydia sits on the couch. Emre works on his homework and Chris watches TV. \n Ares and Lucas watch Westworld."
+    for line in sys.stdin:
+        data = data + line
     return data
 
 def main():
