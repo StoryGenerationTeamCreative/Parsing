@@ -13,7 +13,7 @@ stmmr = PorterStemmer()
 # possible optimization: initialize stmmr and/or lmmtzr once in main and pass as argument?
 
 def createEvent(s, v, o, m):
-    event = [""] * 4
+    event = ["EMPTYPARAM"] * 4
     event[0] = stem(s)
     event[1] = stem(v)
     event[2] = stem(o)
