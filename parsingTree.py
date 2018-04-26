@@ -13,11 +13,17 @@ stmmr = PorterStemmer()
 # possible optimization: initialize stmmr and/or lmmtzr once in main and pass as argument?
 
 def createEvent(s, v, o, m):
-    event = ["EMPTYPARAM"] * 4
+    event = [""] * 4
     event[0] = stem(s)
     event[1] = stem(v)
-    event[2] = stem(o)
-    event[3] = stem(m)
+    if (o == ""):
+        event[2] = "EMPTYPARAM"
+    else:
+        event[2] = stem(o)
+    if (m == ""):
+        event[3] = "EMPTYPARAM"
+    else:
+        event[3] = stem(m)
     return event
 
 def parseSentence(data):
