@@ -10,8 +10,6 @@ nlp = spacy.load('en')
 lmtzr = WordNetLemmatizer()
 stmmr = PorterStemmer()
 
-# possible optimization: initialize stmmr and/or lmmtzr once in main and pass as argument?
-
 def createEvent(s, v, o, m):
     event = [""] * 4
     event[0] = stem(s)
@@ -31,6 +29,7 @@ def parseSentence(data):
 
     # find root
     for token in doc:
+        print(token.text, token.dep_, token.head.text, token.head.pos_, [child for child in token.children])
         if token.dep_ == "ROOT":
             root = token
 
@@ -72,6 +71,8 @@ def exploreBranch(subj, node, dobj, misc):
         if child.dep_ == "nsubj":
             subj.append(child.text)
             for gchild in child.children:
+                if gchild.dep_ == "amod":
+                    misc.append(gchild.text)
                 if gchild.dep_ == "conj":
                     subj.append(gchild.text)
 
@@ -81,6 +82,15 @@ def exploreBranch(subj, node, dobj, misc):
             for gchild in child.children:
                 if gchild.dep_ == "conj":
                     dobj.append(gchild.text)
+                if gchild.dep_ == "amod":
+                    misc.append(gchild.text)
+                if gchild.dep_ == "prep":
+                    for baby in gchild.children:
+                        if baby.dep_ == "pobj":
+                            misc.append(baby.text)
+                            for fetus in baby.children:
+                                if fetus.dep_ == "conj":
+                                    misc.append(fetus.text)
         if child.dep_ == "prep":
             for gchild in child.children:
                 if gchild.dep_ == "pobj":
@@ -88,12 +98,16 @@ def exploreBranch(subj, node, dobj, misc):
                     for baby in gchild.children:
                         if baby.dep_ == "conj":
                             dobj.append(baby.text)
+                        if baby.dep_ == "amod":
+                            misc.append(baby.text)
 
         # find indirect objects and adverbs
         if child.dep_ == "dative":
             misc.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
+                    misc.append(gchild.text)
+                if gchild.dep_ == "amod":
                     misc.append(gchild.text)
         if child.dep_ == "advmod":
             misc.append(child.text)
@@ -106,7 +120,6 @@ def exploreBranch(subj, node, dobj, misc):
             subEvents = exploreBranch(subj, child, dobj, misc)
             for event in subEvents:
                 allEvents.append(event)
-        
 
     if len(subj) == 0:
         subj = superS
@@ -143,9 +156,9 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    data = ""
-    for line in sys.stdin:
-        data = data + line
+    data = "I am afraid of Spiders and People."
+    # for line in sys.stdin:
+    #     data = data + line
     return data
 
 def main():
