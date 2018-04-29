@@ -10,8 +10,6 @@ nlp = spacy.load('en')
 lmtzr = WordNetLemmatizer()
 stmmr = PorterStemmer()
 
-# possible optimization: initialize stmmr and/or lmmtzr once in main and pass as argument?
-
 def createEvent(s, v, o, m):
     event = [""] * 4
     event[0] = stem(s)
@@ -31,6 +29,7 @@ def parseSentence(data):
 
     # find root
     for token in doc:
+        print(token.text, token.dep_, token.head.text, token.head.pos_, [child for child in token.children])
         if token.dep_ == "ROOT":
             root = token
 
@@ -72,41 +71,90 @@ def exploreBranch(subj, node, dobj, misc):
         if child.dep_ == "nsubj":
             subj.append(child.text)
             for gchild in child.children:
-                if gchild.dep_ == "conj":
+                if gchild.dep_ == "amod":
+                    misc.append(gchild.text)
+                elif gchild.dep_ == "conj":
                     subj.append(gchild.text)
-
+                elif gchild.dep_ == "relcl":
+                    subEvents = exploreBranch(subj, gchild, dobj, misc)
+                    for event in subEvents:
+                        allEvents.append(event)
         # find objects (direct and objects of preposition, predicate nominatives and adjectives)
-        if child.dep_ == "dobj" or child.dep_ == "acomp" or child.dep_ == "attr":
+        elif child.dep_ == "dobj" or child.dep_ == "acomp" or child.dep_ == "attr":
             dobj.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
                     dobj.append(gchild.text)
-        if child.dep_ == "prep":
+                elif gchild.dep_ == "amod":
+                    misc.append(gchild.text)
+                elif gchild.dep_ == "prep":
+                    for baby in gchild.children:
+                        if baby.dep_ == "pobj":
+                            misc.append(baby.text)
+                            for fetus in baby.children:
+                                if fetus.dep_ == "conj":
+                                    misc.append(fetus.text)
+                                elif fetus.dep_ == "relcl":
+                                    relS = [fetus.head.text]
+                                    relD = []
+                                    relM = []
+                                    subEvents = exploreBranch(relS, fetus, relD, relM)
+                                    for event in subEvents:
+                                        allEvents.append(event)
+                elif gchild.dep_ == "relcl":
+                    relS = [gchild.head.text]
+                    relD = []
+                    relM = []
+                    subEvents = exploreBranch(relS, gchild, relD, relM)
+                    for event in subEvents:
+                        allEvents.append(event)
+        elif child.dep_ == "prep":
             for gchild in child.children:
                 if gchild.dep_ == "pobj":
                     dobj.append(gchild.text)
                     for baby in gchild.children:
                         if baby.dep_ == "conj":
                             dobj.append(baby.text)
+                        elif baby.dep_ == "amod":
+                            misc.append(baby.text)
+                        elif baby.dep_ == "relcl":
+                            relS = [baby.head.text]
+                            relD = []
+                            relM = []
+                            subEvents = exploreBranch(relS, baby, relD, relM)
+                            for event in subEvents:
+                                allEvents.append(event)
 
         # find indirect objects and adverbs
-        if child.dep_ == "dative":
+        elif child.dep_ == "dative":
             misc.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
                     misc.append(gchild.text)
-        if child.dep_ == "advmod":
+                elif gchild.dep_ == "amod":
+                    misc.append(gchild.text)
+                elif gchild.dep_ == "relcl":
+                    relS = [gchild.head.text]
+                    relD = []
+                    relM = []
+                    subEvents = exploreBranch(relS, gchild, relD, relM)
+                    for event in subEvents:
+                        allEvents.append(event)
+        elif child.dep_ == "advmod":
             misc.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
                     misc.append(gchild.text)
 
+        # handle negations
+        elif child.dep_ == "neg":
+            misc.append(child.text)
+
         # find other verbs, either conjunct or subordinate
-        if child.dep_ == "conj" or child.dep_ == "advcl":
+        elif child.dep_ == "conj" or child.dep_ == "advcl":
             subEvents = exploreBranch(subj, child, dobj, misc)
             for event in subEvents:
                 allEvents.append(event)
-        
 
     if len(subj) == 0:
         subj = superS
@@ -143,9 +191,9 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    data = ""
-    for line in sys.stdin:
-        data = data + line
+    data = "I am afraid of spiders, which are big. I sing of a man, who first came from the shores of Troy."
+    # for line in sys.stdin:
+    #     data = data + line
     return data
 
 def main():
