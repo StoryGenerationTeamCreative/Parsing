@@ -191,9 +191,9 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    data = "I am afraid of spiders, which are big. I sing of a man, who first came from the shores of Troy."
-    # for line in sys.stdin:
-    #     data = data + line
+    data = ""
+    for line in sys.stdin:
+        data = data + line
     return data
 
 def main():
