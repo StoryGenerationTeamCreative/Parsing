@@ -75,9 +75,8 @@ def exploreBranch(subj, node, dobj, misc):
                     misc.append(gchild.text)
                 if gchild.dep_ == "conj":
                     subj.append(gchild.text)
-
         # find objects (direct and objects of preposition, predicate nominatives and adjectives)
-        if child.dep_ == "dobj" or child.dep_ == "acomp" or child.dep_ == "attr":
+        elif child.dep_ == "dobj" or child.dep_ == "acomp" or child.dep_ == "attr":
             dobj.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
@@ -91,7 +90,7 @@ def exploreBranch(subj, node, dobj, misc):
                             for fetus in baby.children:
                                 if fetus.dep_ == "conj":
                                     misc.append(fetus.text)
-        if child.dep_ == "prep":
+        elif child.dep_ == "prep":
             for gchild in child.children:
                 if gchild.dep_ == "pobj":
                     dobj.append(gchild.text)
@@ -102,21 +101,25 @@ def exploreBranch(subj, node, dobj, misc):
                             misc.append(baby.text)
 
         # find indirect objects and adverbs
-        if child.dep_ == "dative":
+        elif child.dep_ == "dative":
             misc.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
                     misc.append(gchild.text)
                 if gchild.dep_ == "amod":
                     misc.append(gchild.text)
-        if child.dep_ == "advmod":
+        elif child.dep_ == "advmod":
             misc.append(child.text)
             for gchild in child.children:
                 if gchild.dep_ == "conj":
                     misc.append(gchild.text)
 
+        # handle negations
+        elif child.dep_ == "neg":
+            misc.append(child.text)
+
         # find other verbs, either conjunct or subordinate
-        if child.dep_ == "conj" or child.dep_ == "advcl":
+        elif child.dep_ == "conj" or child.dep_ == "advcl":
             subEvents = exploreBranch(subj, child, dobj, misc)
             for event in subEvents:
                 allEvents.append(event)
@@ -156,7 +159,7 @@ def stem(data_string):
     return stmmr.stem(data_string)
 
 def getData():
-    data = "I am afraid of Spiders and People."
+    data = "I sing of a man, who first came from the shores of Troy."
     # for line in sys.stdin:
     #     data = data + line
     return data
