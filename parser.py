@@ -37,6 +37,6 @@ def getChildNouns(word):
 
 if __name__ == "__main__":
     nlp = spacy.load("en")
-    text = nlp("John, Mary, and Billy, went to the park. Sam and Connor walked their dog")
+    text = nlp("John, Mary, and Billy, went to the park, and Sam and Connor walked their dog")
     spacy.displacy.serve(text, style='dep')
     #print(getChildNouns(getVerbs(text)[1]))

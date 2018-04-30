@@ -11,7 +11,7 @@ def scrape():
     pages = flatten(map(lambda x : wikipedia.page(x).links, references))
     plots = map(tryGetPlot, pages)
     nonEmpty = filter(lambda plot : plot != None, plots)
-    longEnough = filter(lambda plot : len(plot) >= 300, nonEmpty)
+    longEnough = filter(lambda plot : len(plot) >= 150, nonEmpty)
     noNewLines = map(lambda plot : plot.replace("\n", " "), longEnough)
     noActors = map(lambda plot: re.sub(r" ?\([^)]+\)", "", plot), noNewLines)
     readable = filter(lambda plot: textstat.flesch_reading_ease(plot) > 70, noActors) 
