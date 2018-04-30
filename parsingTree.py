@@ -48,8 +48,16 @@ def parseSentence(data):
     
     return events, properNouns
 
+def single(node):
+    if node.pos_ == "PROPN":
+        return "CHAR1"
+    elif node.pos_ == "PRON":
+        return node.text
+    else:
+        return node.lemma_
+
 def exploreBranch(subj, node, dobj, misc):
-    verb = node.text
+    verb = node.lemma_
 
     allEvents = []
 
@@ -71,40 +79,40 @@ def exploreBranch(subj, node, dobj, misc):
         
         # find subject
         if child.dep_ == "nsubj":
-            subj.append(child.lemma_)
+            subj.append(single(child))
             for gchild in child.children:
                 if gchild.dep_ == "amod":
-                    misc.append(gchild.lemma_)
+                    misc.append(single(gchild))
                 elif gchild.dep_ == "conj":
-                    subj.append(gchild.lemma_)
+                    subj.append(single(gchild))
                 elif gchild.dep_ == "relcl":
                     subEvents = exploreBranch(subj, gchild, dobj, misc)
                     for event in subEvents:
                         allEvents.append(event)
         # find objects (direct and objects of preposition, predicate nominatives and adjectives)
         elif child.dep_ == "dobj" or child.dep_ == "acomp" or child.dep_ == "attr":
-            dobj.append(child.lemma_)
+            dobj.append(single(child))
             for gchild in child.children:
                 if gchild.dep_ == "conj":
-                    dobj.append(gchild.lemma_)
+                    dobj.append(single(gchild))
                 elif gchild.dep_ == "amod":
-                    misc.append(gchild.lemma_)
+                    misc.append(single(gchild))
                 elif gchild.dep_ == "prep":
                     for baby in gchild.children:
                         if baby.dep_ == "pobj":
-                            misc.append(baby.lemma_)
+                            misc.append(single(baby))
                             for fetus in baby.children:
                                 if fetus.dep_ == "conj":
-                                    misc.append(fetus.lemma_)
+                                    misc.append(single(fetus))
                                 elif fetus.dep_ == "relcl":
-                                    relS = [fetus.head.lemma_]
+                                    relS = [single(fetus.head)]
                                     relD = []
                                     relM = []
                                     subEvents = exploreBranch(relS, fetus, relD, relM)
                                     for event in subEvents:
                                         allEvents.append(event)
                 elif gchild.dep_ == "relcl":
-                    relS = [gchild.head.lemma_]
+                    relS = [single(gchild.head)]
                     relD = []
                     relM = []
                     subEvents = exploreBranch(relS, gchild, relD, relM)
@@ -113,14 +121,14 @@ def exploreBranch(subj, node, dobj, misc):
         elif child.dep_ == "prep":
             for gchild in child.children:
                 if gchild.dep_ == "pobj":
-                    dobj.append(gchild.lemma_)
+                    dobj.append(single(gchild))
                     for baby in gchild.children:
                         if baby.dep_ == "conj":
-                            dobj.append(baby.lemma_)
+                            dobj.append(single(baby))
                         elif baby.dep_ == "amod":
-                            misc.append(baby.lemma_)
+                            misc.append(single(baby))
                         elif baby.dep_ == "relcl":
-                            relS = [baby.head.lemma_]
+                            relS = [single(baby.head)]
                             relD = []
                             relM = []
                             subEvents = exploreBranch(relS, baby, relD, relM)
@@ -129,28 +137,28 @@ def exploreBranch(subj, node, dobj, misc):
 
         # find indirect objects and adverbs
         elif child.dep_ == "dative":
-            misc.append(child.lemma_)
+            misc.append(single(child))
             for gchild in child.children:
                 if gchild.dep_ == "conj":
-                    misc.append(gchild.lemma_)
+                    misc.append(single(gchild))
                 elif gchild.dep_ == "amod":
-                    misc.append(gchild.lemma_)
+                    misc.append(single(gchild))
                 elif gchild.dep_ == "relcl":
-                    relS = [gchild.head.lemma_]
+                    relS = [single(gchild.head)]
                     relD = []
                     relM = []
                     subEvents = exploreBranch(relS, gchild, relD, relM)
                     for event in subEvents:
                         allEvents.append(event)
         elif child.dep_ == "advmod":
-            misc.append(child.lemma_)
+            misc.append(single(child))
             for gchild in child.children:
                 if gchild.dep_ == "conj":
-                    misc.append(gchild.lemma_)
+                    misc.append(single(gchild))
 
         # handle negations
         elif child.dep_ == "neg":
-            misc.append(child.lemma_)
+            misc.append(single(child))
 
         # find other verbs, either conjunct or subordinate
         elif child.dep_ == "conj" or child.dep_ == "advcl":
@@ -177,20 +185,7 @@ def exploreBranch(subj, node, dobj, misc):
                 allEvents.append(createEvent(sub, verb, do, mi))
     
     return allEvents
-    
 
-def getPOS(data_string):
-    tokens = nltk.word_tokenize(data_string)
-    tags = nltk.pos_tag(tokens)
-    return tags
-
-lmtzr = WordNetLemmatizer()
-def lemma(data_string):
-    return lmtzr.lemmatize(data_string)
-
-stmmr = PorterStemmer()
-def stem(data_string):
-    return stmmr.stem(data_string)
 
 def getData():
     data = ""
@@ -224,6 +219,9 @@ def main():
 
     numNouns = len(properNouns)
     distinctNouns = len(set(properNouns))
+
+    print()
+    print(properNouns)
     
     # print((time.time() - start_time))
     print("number of Stories: %d" % (numStories))

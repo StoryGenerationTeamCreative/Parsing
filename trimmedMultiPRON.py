@@ -51,8 +51,8 @@ def parseSentence(data):
 def single(node):
     if node.pos_ == "PRON":
         return node.text
-    elif node.pos_ == "PROPN":
-        return "CHAR1"
+    # elif node.pos_ == "PROPN":
+    #   return "CHAR1"
     else:
         return node.lemma_
 
@@ -79,7 +79,6 @@ def exploreBranch(subj, node, dobj, misc):
         
         # find subject
         if child.dep_ == "nsubj":
-            subj.append(single(child))
             for gchild in child.children:
                 if gchild.dep_ == "amod":
                     misc.append(single(gchild))
@@ -191,12 +190,11 @@ def main():
         print("EOS\tEOS\tEOS\tEOS")
 
     numNouns = len(properNouns)
-    distinctNouns = len(set(properNouns))
     
     # print((time.time() - start_time))
     print("number of Stories: %d" % (numStories))
     print("number of Sentences: %d" % (numSentences))
     print("number of Events: %d, Per Story: %.3f, Per Sentence: %.3f" % (numEvents, numEvents / numStories, numEvents / numSentences))
-    print("number of proper nouns: %d, unique: %d" % (numNouns, distinctNouns))
+    print("number of unique proper nouns: %d" % (numNouns))
 
 main()

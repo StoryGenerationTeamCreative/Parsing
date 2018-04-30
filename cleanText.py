@@ -2,8 +2,11 @@ import json
 import sys
 import string
 
+dictionary = " qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM,.!?\'\""
+
 def clean(string):
     string = string.encode('ascii', errors = 'ignore').decode()
+    
     return string
 
 def main():
