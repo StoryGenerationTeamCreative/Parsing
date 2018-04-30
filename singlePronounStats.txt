@@ -1,0 +1,16 @@
+number of Stories: 1275
+number of Sentences: 41481
+number of Events: 92465, Per Story: 72.522, Per Sentence: 2.229
+number of proper nouns: 85813, unique: 10152
+
+most common subjects
+[('-PRON-', 23855), ('who', 2083), ('SOS', 1275), ('EOS', 1275), ('man', 663), ('film', 530), ('father', 497), ('which', 446), ('friend', 433), ('that', 414), ('girl', 384), ('mother', 373), ('jack', 340), ('john', 339), ('tom', 334), ('david', 332), ('group', 321), ('one', 315), ('family', 312), ('this', 284), ('joe', 270), ('boy', 266), ('paul', 224), ('woman', 209), ('george', 208), ('wife', 207), ('gang', 204), ('two', 202), ('child', 188), ('henry', 179)]
+most common verbs
+[('is', 3920), ('tells', 1745), ('takes', 1329), ('SOS', 1275), ('EOS', 1275), ('finds', 1196), ('are', 1120), ('find', 978), ('goes', 960), ('has', 949), ('gives', 880), ('asks', 772), ('tries', 745), ('sees', 742), ('meets', 710), ('leaves', 709), ('returns', 671), ('becomes', 649), ('gets', 638), ('go', 613), ('take', 609), ('comes', 581), ('decides', 542), ('have', 542), ('begins', 528), ('says', 527), ('arrives', 519), ('falls', 515), ('makes', 512), ('runs', 477)]
+most common objects
+[('EMPTYPARAM', 16497), ('-PRON-', 7463), ('SOS', 1275), ('EOS', 1275), ('time', 582), ('house', 553), ('friend', 492), ('way', 425), ('home', 418), ('love', 411), ('room', 338), ('one', 333), ('man', 316), ('day', 291), ('which', 289), ('life', 269), ('story', 258), ('help', 254), ('child', 248), ('father', 244), ('car', 238), ('town', 225), ('death', 225), ('family', 224), ('money', 219), ('other', 217), ('boy', 213), ('mother', 208), ('girl', 208), ('relationship', 199)]
+most common modifiers
+[('EMPTYPARAM', 41480), ('when', 2689), ('then', 2199), ('not', 1387), ('later', 1352), ('SOS', 1275), ('EOS', 1275), ('back', 1091), ('where', 1035), ('however', 989), ('-PRON-', 908), ('meanwhile', 764), ('also', 710), ('away', 650), ('eventually', 564), ('home', 515), ('soon', 492), ('so', 490), ('old', 488), ('new', 468), ('finally', 452), ('first', 444), ('again', 427), ('other', 405), ('only', 395), ('young', 385), ('together', 382), ('now', 376), ('there', 344), ('still', 297)]
+
+unique subjects : 6180, verbs : 4991, objects : 8657, modifiers : 4965
+event to event repeats, subjects : 45213, verbs : 30718, objects : 24309, modifiers : 40127
