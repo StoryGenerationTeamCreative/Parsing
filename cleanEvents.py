@@ -7,9 +7,14 @@ def main():
         words = line.split("\t")
         outline = ""
         legal = True
+        count = 0
         for word in words:
             if any(c in word for c in dictionary):
-                outline += word + "\t"
+                if count == 3:
+                    outline += word
+                else:
+                    outline += word + "\t"
+                count += 1
             else:
                 legal = False
                 break
@@ -17,5 +22,5 @@ def main():
                 legal = False
                 break
         if legal:
-            print(outline,end="")
+            print(outline, end="")
 main()
