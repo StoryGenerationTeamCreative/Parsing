@@ -131,7 +131,8 @@ def exploreBranch(subj, node, dobj, misc):
         elif child.dep_ == "conj" or child.dep_ == "advcl":
             subEvents = exploreBranch(subj, child, dobj, misc)
             for event in subEvents:
-                allEvents.append(event)
+                if len(allEvents) == 0:
+                    allEvents.append(event)
                 break
     
     if len(subj) == 0:
