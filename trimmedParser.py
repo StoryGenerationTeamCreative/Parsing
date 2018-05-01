@@ -53,7 +53,7 @@ def single(node):
     if node.pos_ == "PRON":
         return node.text
     elif node.pos_ == "PROPN":
-        return "CHAR1"
+        return "CHAR"
     else:
         return node.lemma_
 

@@ -1,15 +1,17 @@
 import sys
 
-dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvx"
+dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+dictionary = list(dictionary)
 
 def main():
     for line in sys.stdin:
         words = line.split("\t")
+        words[3] = words[3][:-1]
         outline = ""
         legal = True
         count = 0
         for word in words:
-            if any(c in word for c in dictionary):
+            if all(c in dictionary for c in word):
                 if count == 3:
                     outline += word
                 else:
@@ -22,5 +24,5 @@ def main():
                 legal = False
                 break
         if legal:
-            print(outline, end="")
+            print(outline)
 main()
