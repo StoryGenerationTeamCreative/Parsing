@@ -5,6 +5,7 @@ import sys
 import time
 from nltk.stem.porter import PorterStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
+import pickle
 
 nlp = spacy.load('en')
 
@@ -23,7 +24,7 @@ def createEvent(s, v, o, m):
     return event
 
 def parseSentence(data):
-    doc = nlp(data)
+    doc = data
     properNouns = []
 
     # find root
@@ -40,12 +41,12 @@ def parseSentence(data):
         # not a complete sentence, ignore.
         # print("nameError")
         return [], ""
-    
+
     subj = []
     dobj = []
     misc = []
     events = exploreBranch(subj, root, dobj, misc)
-    
+
     return events, properNouns
 
 def single(node):
@@ -58,7 +59,7 @@ def single(node):
 
 def exploreBranch(subj, node, dobj, misc):
     verb = node.lemma_
-    
+
     allEvents = []
 
     superS = subj
@@ -76,7 +77,7 @@ def exploreBranch(subj, node, dobj, misc):
     for child in node.children:
         # another debugging statement
         # print(child.text, child.dep_, child.head.text, child.head.pos_, [gchild for gchild in child.children])
-        
+
         # find subject
         if child.dep_ == "nsubj":
             subj.append(single(child))
@@ -134,15 +135,15 @@ def exploreBranch(subj, node, dobj, misc):
                 if len(allEvents) == 0:
                     allEvents.append(event)
                 break
-    
+
     if len(subj) == 0:
         subj = superS
-        
+
     if len(dobj) == 0 and len(superO) == 0:
         dobj = [""]
     elif len(dobj) == 0:
         dobj = superO
-        
+
     if len(misc) == 0 and len(superM) == 0:
         misc = [""]
     elif len(misc) == 0:
@@ -151,38 +152,45 @@ def exploreBranch(subj, node, dobj, misc):
     count = 0
     if node.dep_ != "ROOT":
         count = 1
-    
+
     for su in subj:
         for do in dobj:
             for mi in misc:
                 allEvents.append(createEvent(su, verb, do, mi))
                 if len(allEvents) >= 2:
                     return allEvents
-    
+
     return allEvents
 
 def getData():
-    data = ""
-    for line in sys.stdin:
-        data = data + line
-    return data
+    parsedSentences = None
+    try:
+        inputFile= open('serializedParse.pkl', 'rb')
+        parsedStories = pickle.load(inputFile)
+        inputFile.close()
+    except FileNotFoundError:
+        parsedStories = []
+        for line in sys.stdin:
+            parsedStories.append(list(map(nlp, line.split("."))))
+            output = open('serializedParse.pkl', 'wb')
+            pickle.dump(parsedStories, output)
+            output.close()
+    return parsedStories
 
 def main():
-    plainText = getData()
-    stories = plainText.splitlines()
-    numStories = len(stories)
+    parsedStories = getData()
+    numStories = len(parsedStories)
     # print(data)
 
     # start_time = time.time()
-    
+
     numSentences = 0
     numEvents = 0
     properNouns = []
-    for story in stories:
+    for story in parsedStories:
         print("SOS\tSOS\tSOS\tSOS")
-        data = story.split(".")
-        numSentences += len(data) - 1
-        for sentence in data:
+        numSentences += len(story) - 1
+        for sentence in story:
             events, proper = parseSentence(sentence)
             for noun in proper:
                 properNouns.append(noun)
@@ -193,7 +201,7 @@ def main():
 
     numNouns = len(properNouns)
     distinctNouns = len(set(properNouns))
-    
+
     # print((time.time() - start_time))
     print("number of Stories: %d" % (numStories))
     print("number of Sentences: %d" % (numSentences))
