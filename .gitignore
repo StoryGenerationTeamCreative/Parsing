@@ -3,3 +3,4 @@ testingEv
 text.txt
 __pycache__/parser.cpython-36.pyc
 .parsingTree.py.swp
+*.pkl
