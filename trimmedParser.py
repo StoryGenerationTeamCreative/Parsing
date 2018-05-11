@@ -172,9 +172,9 @@ def getData():
         parsedStories = []
         for line in sys.stdin:
             parsedStories.append(list(map(nlp, line.split("."))))
-        output = open('serializedParse.pkl', 'wb')
-        pickle.dump(parsedStories, output)
-        output.close()
+        #output = open('serializedParse.pkl', 'wb')
+        #pickle.dump(parsedStories, output)
+        #output.close()
     return parsedStories
 
 def main():
