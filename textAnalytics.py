@@ -16,7 +16,9 @@ def main():
     verbRepeats = 0
     objectRepeats = 0
     modifierRepeats = 0
+    fullVocab = []
     for x in range(setSize):
+        fullVocab.append(data[x])
         if x % 4 == 0:
             sub.append(data[x])
             if x > 3 and data[x] == data[x - 4]:
@@ -33,6 +35,9 @@ def main():
             mis.append(data[x])
             if x > 3 and data[x] == data[x - 4]:
                 modifierRepeats += 1
+    wordNum = len(set(fullVocab))
+    print("total vocabulary:")
+    print(wordNum)
     a = Counter(sub)
     uniqueS = len(set(sub))
     b = Counter(ver)
